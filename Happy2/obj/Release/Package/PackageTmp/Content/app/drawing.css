@@ -1,0 +1,480 @@
+﻿html {
+	height: 100%;
+}
+
+body {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+a {
+	text-decoration: none;
+	color: black;
+	cursor: pointer;
+}
+
+	a:hover {
+		text-decoration: none;
+	}
+
+.full_size {
+	position: absolute;
+	height: 100%;
+	width: 100%;
+}
+
+.not_show {
+	display: none;
+}
+
+#render_canvas {
+	position: absolute;
+	height: 500px;
+	width: 500px;
+	display: none;
+}
+
+#go_up {
+	border-width: 0 25px 25px 25px;
+	border-color: transparent transparent #808080 transparent;
+	top: 0;
+	left: calc(50% - 25px);
+}
+
+	#go_up:hover {
+		border-color: transparent transparent #F08080 transparent;
+	}
+
+#go_down {
+	border-width: 25px 25px 0 25px;
+	border-color: #808080 transparent transparent transparent;
+	top: calc(100% - 25px);
+	left: calc(50% - 25px);
+}
+
+	#go_down:hover {
+		border-color: #F08080 transparent transparent transparent;
+	}
+
+#go_left {
+	border-width: 25px 25px 25px 0;
+	border-color: transparent #808080 transparent transparent;
+	top: calc(50% - 25px);
+	left: 0;
+}
+
+	#go_left:hover {
+		border-color: transparent #F08080 transparent transparent;
+	}
+
+#go_right {
+	border-width: 25px 0 25px 25px;
+	border-color: transparent transparent transparent #808080;
+	top: calc(50% - 25px);
+	left: calc(100% - 25px);
+}
+
+	#go_right:hover {
+		border-color: transparent transparent transparent #F08080;
+	}
+
+.go_arrow {
+	position: absolute;
+	width: 0;
+	height: 0;
+	border-style: solid;
+	z-index: 1032; /*above navbar-fixed-bottom*/
+}
+
+.tool_button {
+	position: absolute;
+	//width: 50px;
+	//height: 35px;
+	padding: 5px 15px 5px 15px;
+}
+
+#my_toolbar_collapse button > img, .navbar-header button > img {
+	width: 20px;
+	height: 20px;
+	margin: 5px 5px 5px 5px;
+}
+
+@media (min-width: 992px) {
+	#my_toolbar_collapse button > img, .navbar-header button > img {
+		width: 25px;
+		height: 25px;
+		margin: 5px 15px 5px 15px;
+	}
+}
+
+.tool_button.active {
+	box-shadow: 0px 0px 4px 2px rgba(255,0,0,0.6);
+}
+
+.cursor_pencil {
+	cursor: url(/Images/ps-pencil.cur), auto;
+}
+
+.cursor_hand {
+	cursor: url(/Images/ps-hand.cur), auto;
+}
+
+.cursor_eraser {
+	cursor: url(/Images/ps-eraser.cur), auto;
+}
+
+.cursor_scissor {
+	cursor: url(/Images/scissors.cur), auto;
+}
+
+.cursor_trash {
+	cursor: url(/Images/trash_can.cur), auto;
+}
+
+.cursor_picture {
+	cursor: url(/Images/picture.cur), auto;
+}
+
+.cursor_select {
+	cursor: crosshair;
+}
+
+.cursor_paste {
+	cursor: default;
+}
+
+.cursor_note {
+	cursor: text;
+}
+
+#activity_list {
+	position: absolute;
+	left: 10px;
+	top: 10%;
+	padding-bottom: 10px;
+	padding-top: 10px;
+	padding-right: 10px;
+	background-color: rgba(128,128,128,0.3);
+}
+
+	#activity_list > li {
+		cursor: pointer;
+	}
+
+		#activity_list > li:hover {
+			color: blue;
+			font-weight: bold;
+		}
+
+/*#msg_para {
+	position: absolute;
+	left: 40%;
+	top: 50px;
+	color: red;
+}*/
+
+/*#info_para {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	color: blue;
+	padding: 0px 10px;
+	background-color: rgba(224,224,224,0.7);
+}*/
+
+/*#coord_para {
+	float: right;
+	color: green;
+	padding: 10px;
+}*/
+
+#name_ipt {
+	width: 6em;
+}
+
+#status_ipt {
+	width: 12em;
+}
+
+#note_ipt {
+	width: 20em;
+}
+/*user select text interferes with mouse panning*/
+.unselectable {
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.sticker {
+	position: absolute;
+	color: purple;
+	//font-family: "Myriad Set Pro","Lucida Grande","Helvetica Neue","Helvetica","Arial","Verdana","sans-serif";
+	text-align: center;
+	max-width: 20em;
+	word-wrap: break-word;
+}
+
+	.sticker > h5 {
+		font-weight: bold;
+	}
+
+/*.noter is hard coded in prepareStyleSheet() as key name to find.*/
+.noter {
+	position: absolute;
+	color: seagreen;
+	word-wrap: break-word;
+	font-size: 1em; /*may be changed using script*/
+	max-width: 20em;
+}
+
+.my_transparent {
+	background-color: transparent;
+	border-color: transparent;
+}
+
+#select_room_label {
+	color: white;
+	font-weight: normal;
+	font-size: 100%;
+}
+
+#coord_para {
+	color: white;
+	font-weight: normal;
+	font-size: 100%;
+}
+
+.modal-body .alert {
+	margin-top: 1em;
+}
+
+.modal-body .input-group {
+	margin-bottom: 1em;
+}
+
+.fw_normal {
+	font-weight: normal;
+}
+
+.tooltip-inner {
+	white-space: pre-wrap;
+	text-align: left;
+}
+
+.user_picture {
+	position: absolute;
+}
+
+#color_panel {
+	//position: absolute;
+	//right: 10px;
+	background-color: transparent;
+}
+
+#chat_panel {
+	//position: absolute;
+	//top: 50px;
+	//right: 10px;
+	min-width: 10em;
+}
+
+#chat_content {
+	width: 22em;
+	height: 5em /*50%*/;
+	overflow-x: auto;
+	overflow-y: auto;
+}
+
+	#chat_content > p > span:first-child {
+		font-weight: bold;
+	}
+
+#brush_panel {
+	width: 15em;
+	background-color: transparent;
+}
+
+#brush_content {
+	height: 10em;
+	overflow-x: auto;
+	overflow-y: auto;
+}
+
+#tip_size_panel {
+	//position: absolute;
+	//right: 200px;
+	background-color: transparent;
+	width: 40px;
+	margin-right: 10px; /*space between tip_size_panel and color_panel*/
+}
+
+	#tip_size_panel .panel-body {
+		padding: 0px;
+	}
+
+	#tip_size_panel .panel-heading {
+		padding-left: 0px;
+		padding-right: 0px;
+		text-align: center;
+	}
+
+#tip_size_dragger {
+	position: relative;
+	//width: 30px;
+	//height: 30px;
+	border-radius: 50%;
+	padding: 0;
+	display: inline-block;
+}
+
+#note_panel {
+	//position: absolute;
+	//left: 10px;
+	min-width: 10em;
+}
+
+#note_content {
+	width: 20em;
+	height: 10em;
+	overflow-x: auto;
+	overflow-y: auto;
+}
+
+#hot_room_panel {
+	background-color: transparent;
+}
+
+
+
+#layer_panel {
+	//position: absolute;
+	//top: 50px;
+	//left: 10px;
+	width: 10em;
+}
+
+#right_sidebar {
+	position: absolute;
+	right: 10px;
+	top: 10%;
+}
+
+#left_sidebar {
+	position: absolute;
+	left: 10px;
+	top: 10%;
+}
+
+#my_navbar_collapse button img {
+	width: 16px;
+	height: 16px;
+}
+
+#select_rect {
+	display: none;
+	position: absolute;
+	border: 1px dotted red;
+}
+
+#select_bar {
+	display: none;
+	position: absolute;
+}
+
+#note_bar {
+	display: none;
+	position: absolute;
+}
+
+#paste_bar {
+	display: none;
+	position: absolute;
+}
+
+	#paste_bar button img {
+		width: 16px;
+		height: 16px;
+	}
+
+#pictureDlg .nav-tabs {
+	margin-bottom: 15px;
+}
+
+#pict_preview_img {
+	margin-bottom: 5px;
+}
+
+td.rptnc {
+	width: 30%;
+}
+
+.rptnc > img {
+	width: 100%;
+}
+
+.cursor_pointer {
+	cursor: pointer;
+}
+
+.list-group-item {
+	border-style: none;
+	background-color: transparent;
+	padding-top: 3px;
+	padding-bottom: 3px;
+}
+
+.panel {
+	margin-bottom: 5px;
+}
+
+.adjust_slider .progress-bar {
+	//min-width: 6em;
+	transition: none;
+}
+
+.adjust_slider {
+	cursor: ew-resize;
+}
+
+#alert_container {
+	position: absolute;
+	width: 100%;
+	height: 0px;
+}
+
+	#alert_container > div {
+		display: inline-block;
+	}
+
+	#alert_container .alert {
+		margin-bottom: 1em;
+	}
+
+/*Override bootstrap*/
+p {
+	margin: 0 0 5px;
+}
+
+.panel-heading {
+	padding: 5px 10px;
+}
+
+.panel-body {
+	padding: 5px 10px;
+}
+
+.btn {
+	padding: 3px 6px;
+}
+
+.progress {
+	margin-bottom: 10px;
+}

@@ -1,0 +1,471 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="description" content="Online multi-player drawing site. Draw, sketch, and scribble with others. Interact, team-work, or monkey." />
+	<meta name="keywords" content="draw, sketch, scribble, online, multi-user, multi-player" />
+
+	<title>Happy drawing !</title>
+	<link href="/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+	<link href="/Content/bootstrap.min.css" rel="stylesheet" />
+	<link href="/Content/chromoselector.css" rel="stylesheet" />
+
+	<!--If a new css file is added, remember to modify prepareStyleSheet().-->
+	<link href="/Content/app/drawing.css" rel="stylesheet" />
+	<!--<link href="Content/app/css" rel="stylesheet" />-->
+</head>
+<body onload="onBodyLoad()">
+	<div id="pictureDlg" class="modal" tabindex="-1" role="dialog">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title">Choose image</h4>
+				</div>
+				<div class="modal-body">
+					<p id="pict_info" class="text-center">Width: <mark></mark>, height: <mark></mark>, file size: <strong></strong>.</p>
+					<p id="pict_error" class="bg-warning text-center"></p>
+					<div>
+						<ul class="nav nav-tabs" role="tablist">
+							<li role="presentation" class="active"><a href="#tab_url_file" aria-controls="tab_url_file" role="tab" data-toggle="tab">URL / File</a></li>
+							<li role="presentation"><a href="#tab_my_recent" aria-controls="tab_my_recent" role="tab" data-toggle="tab">My recent</a></li>
+							<li role="presentation"><a href="#tab_others" aria-controls="tab_others" role="tab" data-toggle="tab">Other's</a></li>
+						</ul>
+						<div class="tab-content">
+							<div role="tabpanel" class="tab-pane active" id="tab_url_file">
+								<form class="form-horizontal">
+									<div class="form-group">
+										<label for="pict_url_ipt" class="col-sm-2 control-label">From URL</label>
+										<div class="col-sm-9 input-group">
+											<input type="text" class="form-control" id="pict_url_ipt" maxlength="100" placeholder="Image URL..." />
+											<span class="input-group-btn">
+												<button class="btn btn-default" type="button" onclick="onPictUrl()">Check</button>
+											</span>
+										</div>
+									</div>
+									<div class="form-group">
+										<label for="pict_file_chooser" class="col-sm-2 control-label">From file</label>
+										<div class="col-sm-9">
+											<input type='file' id='pict_file_chooser' accept='image/*' onchange="onPictChosen(this.files); /*this.value = null;*/" />
+										</div>
+									</div>
+								</form>
+							</div>
+							<div role="tabpanel" class="tab-pane" id="tab_my_recent">
+								<table class="table table-hover" id="my_recent_pict_tbl">
+								</table>
+							</div>
+							<div role="tabpanel" class="tab-pane" id="tab_others">
+								<table class="table table-hover" id="others_pict_tbl">
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" data-dismiss="modal" id="pict_ok_btn" onclick="onPictureClick()" disabled="disabled">Ok</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="infoDlg" class="modal" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title">Information</h4>
+				</div>
+				<div class="modal-body">
+					<h4>Hotkey:</h4>
+					<ol>
+						<li>Up, Down, Left, Right: Move.</li>
+					</ol>
+					<h4>Link:</h4>
+					<ul>
+						<li>Facebook: <a href="https://www.facebook.com/HappyDrawingShip" target="_blank">https://www.facebook.com/HappyDrawingShip</a></li>
+						<li>Contact: <a href="mailto:helaccsa@gmail.com">helaccsa@gmail.com</a></li>
+					</ul>
+					<h4>User guide:</h4>
+					<ul>
+						<li><a href="https://happydrawingship.wordpress.com/2015/06/22/happy-drawing-user-guide/" target="_blank">English</a></li>
+						<li><a href="https://happydrawingship.wordpress.com/2015/06/22/happy-drawing-%E4%BD%BF%E7%94%A8%E8%AA%AA%E6%98%8E-2/" target="_blank">中文</a></li>
+					</ul>
+					<h4>FAQ:</h4>
+					<ul>
+						<li><a href="https://happydrawingship.wordpress.com/2016/03/30/happy-drawing-%E5%B8%B8%E8%A6%8B%E5%95%8F%E7%AD%94/" target="_blank">中文</a></li>
+					</ul>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="createRoomDlg" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title">Create New Room</h4>
+				</div>
+				<div class="modal-body">
+					<div class="input-group">
+						<label for="room_name_ipt" class="input-group-addon">Name</label>
+						<input type="text" id="room_name_ipt" maxlength="100" class="form-control" placeholder="Room name..." />
+					</div>
+					<div class="checkbox">
+						<label>
+							<input type="checkbox" id="can_picture_check" />
+							Allow upload images or link to external images.
+						</label>
+						<label>
+							<input type="checkbox" id="private_check" />
+							Private. Only the ones who know the URL can enter this room.
+						</label>
+					</div>
+					<div class="alert alert-warning" role="alert" id="create_room_result"></div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" onclick="doCreateRoom()">Ok</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="saveFigureDlg" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title">Save a figure</h4>
+				</div>
+				<div class="modal-body">
+					<div class="input-group">
+						<label for="figure_name_ipt" class="input-group-addon">Name</label>
+						<input type="text" id="figure_name_ipt" maxlength="100" class="form-control" placeholder="Figure name..." />
+					</div>
+					<div class="alert alert-warning" role="alert" id="save_figure_result"></div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" id="figure_ok_btn" onclick="doSaveFigure()">Ok</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<canvas id="render_canvas" width="500" height="500" draggable="false"></canvas>
+	<canvas id="bground_canvas" class="full_size" draggable="false"></canvas>
+	<div id="picture_container"></div>
+	<canvas id="draft_canvas" class="full_size" draggable="false"></canvas>
+	<canvas id="drawing_canvas" class="full_size" draggable="false"></canvas>
+	<canvas id="avatar_canvas" class="full_size accept_mouse" draggable="false"></canvas>
+
+	<div id="select_rect" class="cursor_select"></div>
+
+	<!--<p id="msg_para" class="unselectable"></p>-->
+	<!--<p id="coord_para" class="unselectable"></p>-->
+
+	<!--<ol id="activity_list" class="unselectable"></ol>-->
+	<ul id="right_sidebar" class="list-group">
+		<li class="list-group-item cursor_pointer" onclick="toggleRightSidebar()">
+			<button type="button" class="btn btn-primary">
+				<span class="glyphicon glyphicon-chevron-right"></span>
+			</button>
+		</li>
+		<li class="list-group-item accept_mouse">
+			<div id="chat_panel" class="panel panel-default">
+				<div class="panel-heading">
+					<button type="button" class="close" id="btnMaxChat" onclick="onMaxChatClick()">
+						<span class="glyphicon glyphicon-resize-full" aria-hidden="true"></span>
+					</button>
+					<h3 class="panel-title">Chats</h3>
+				</div>
+				<div class="panel-body" id="chat_content"></div>
+			</div>
+		</li>
+		<li class="list-group-item clearfix accept_mouse">
+			<div id="color_panel" class="panel panel-default unselectable pull-right">
+				<input type="text" id="color_ipt" class="not_show" value="#000000" />
+			</div>
+			<div id="tip_size_panel" class="panel panel-default pull-right">
+				<div class="panel-heading">
+					<h3 class="panel-title">1</h3>
+				</div>
+				<div class="panel-body">
+					<label class="form-control" id="tip_size_dragger"></label>
+				</div>
+			</div>
+		</li>
+		<li class="list-group-item clearfix accept_mouse">
+			<div id="brush_panel" class="panel panel-default pull-right">
+				<div class="panel-heading">
+					<h3 class="panel-title">Brushes</h3>
+				</div>
+				<ul class="list-group" id="brush_content">
+				</ul>
+			</div>
+		</li>
+		<li class="list-group-item accept_mouse">
+			<div id="blur_adjuster" class="progress adjust_slider">
+				<div class="progress-bar progress-bar-success progress-bar-striped" aria-valuemin="0" aria-valuemax="10">
+					Glow: <span></span>
+				</div>
+			</div>
+			<div id="bglow_adjuster" class="progress adjust_slider">
+				<div class="progress-bar progress-bar-info progress-bar-striped" aria-valuemin="0" aria-valuemax="10">
+					Breath: <span></span>
+				</div>
+			</div>
+		</li>
+	</ul>
+	<ul id="left_sidebar" class="list-group">
+		<li class="list-group-item clearfix cursor_pointer" onclick="toggleLeftSidebar()">
+			<button type="button" class="btn btn-primary pull-right">
+				<span class="glyphicon glyphicon-chevron-left"></span>
+			</button>
+		</li>
+		<li class="list-group-item accept_mouse">
+			<div id="layer_panel" class="">
+				<div class="input-group">
+					<span class="input-group-addon" onclick="helpClick(event, this)">
+						<input type="checkbox" id="checkDrawingLayer" onclick="onCheckLayer(MAIN_LAYER_NUM)" checked />
+					</span>
+					<label class="form-control btn-primary fw_normal" onclick="onClickLayer(MAIN_LAYER_NUM, this)">Drawing</label>
+				</div>
+				<div class="input-group">
+					<span class="input-group-addon" onclick="helpClick(event, this)">
+						<input type="checkbox" id="checkDraftLayer" onclick="onCheckLayer(DRAFT_LAYER_NUM)" checked />
+					</span>
+					<label class="form-control fw_normal" onclick="onClickLayer(DRAFT_LAYER_NUM, this)">Draft</label>
+				</div>
+			</div>
+		</li>
+		<li class="list-group-item accept_mouse">
+			<div id="note_panel" class="panel panel-default">
+				<div class="panel-heading">
+					<button type="button" class="close" id="btnMaxNote" onclick="onMaxNoteClick()">
+						<span class="glyphicon glyphicon-resize-full" aria-hidden="true"></span>
+					</button>
+					<h3 class="panel-title">Messages</h3>
+				</div>
+				<div class="panel-body" id="note_content"></div>
+			</div>
+		</li>
+		<li class="list-group-item accept_mouse">
+			<div id="figure_panel" class="panel panel-default">
+				<div class="panel-heading">
+					<button type="button" class="close" id="btnMaxFigure" onclick="onMaxFigureClick()">
+						<span class="glyphicon glyphicon-resize-full" aria-hidden="true"></span>
+					</button>
+					<h3 class="panel-title">Figures</h3>
+				</div>
+				<ul class="list-group" id="figure_content">
+				</ul>
+				<div class="panel-footer">
+					<ul class="pagination" id="figure_nav">
+						<li>
+							<a onclick='onFigurePageClick(this)' aria-label="Previous">
+								<span aria-hidden="true">&laquo;</span>
+							</a>
+						</li>
+						<li>
+							<a onclick='onFigurePageClick(this)' aria-label="Next">
+								<span aria-hidden="true">&raquo;</span>
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</li>
+		<!--<li class="list-group-item accept_mouse">
+			<div id="hot_room_panel" class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Hot rooms</h3>
+				</div>
+				<ul class="list-group" id="hot_room_content">
+				</ul>
+			</div>
+		</li>-->
+	</ul>
+	<nav class="navbar navbar-default navbar-fixed-bottom my_transparent">
+		<div class="container-fluid">
+			<div class="navbar-header accept_mouse">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#my_toolbar_collapse">
+					<span class="sr-only">Toggle</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<button type="button" class="btn btn-default" id="pencil_tool" onclick="onPencilClick()">
+					<img src="/Images/Pencil.png" /></button>
+				<button type="button" class="btn btn-default" id="filler_tool" onclick="onFillerClick()">
+					<img src="/Images/filler.png" /></button>
+				<button type="button" class="btn btn-default" id="hand_tool" onclick="onHandClick()">
+					<img src="/Images/Hand.png" /></button>
+				<button type="button" class="btn btn-default" id="eraser_tool" onclick="onEraserClick()">
+					<img src="Images/Eraser.png" /></button>
+			</div>
+			<div class="collapse navbar-collapse accept_mouse" id="my_toolbar_collapse">
+				<form class="navbar-form navbar-left">
+					<button type="button" class="btn btn-default" id="scissor_tool" onclick="onScissorClick()">
+						<img src="Images/scissors.png" /></button>
+					<button type="button" class="btn btn-default" id="trash_tool" onclick="onTrashClick()">
+						<img src="Images/trash_can.png" /></button>
+					<button type="button" class="btn btn-default" id="undo_tool" onclick="onUndoClick()">
+						<img src="/Images/undo.png" /></button>
+					<button type="button" class="btn btn-default" id="redo_tool" onclick="onRedoClick()">
+						<img src="/Images/redo.png" /></button>
+					<button type="button" class="btn btn-default" id="note_tool" onclick="onNoteClick()">
+						<img src="/Images/text.png" /></button>
+				</form>
+				<form class="navbar-form navbar-right">
+					<button type="button" class="btn btn-default" id="zoom_in_tool" onclick="onZoomInClick()">
+						<img src="/Images/zoom_in.png" /></button>
+					<button type="button" class="btn btn-default" id="zoom_out_tool" onclick="onZoomOutClick()">
+						<img src="/Images/zoom_out.png" /></button>
+					<button type="button" class="btn btn-default" id="picture_tool" data-toggle="modal" data-target="#pictureDlg">
+						<img src="/Images/picture.png" /></button>
+					<button type="button" class="btn btn-default" id="select_tool" onclick="onSelectClick()">
+						<img src="/Images/select.png" /></button>
+					<button type="button" class="btn btn-default" id="paste_tool" onclick="onPasteClick()">
+						<img src="/Images/paste.png" /></button>
+					<button type="button" class="btn btn-default" id="home_tool" onclick="onHomeClick()">
+						<img src="/Images/Home.png" /></button>
+					<button type="button" class="btn btn-default" id="recent_back_tool" onclick="onRecentBackClick()">
+						<img src="/Images/arrow_left.png" /></button>
+					<button type="button" class="btn btn-default" id="recent_forward_tool" onclick="onRecentForwardClick()">
+						<img src="/Images/arrow_right.png" /></button>
+					<button type="button" class="btn btn-default" id="information_tool" onclick="onInformationClick()">
+						<img src="/Images/information.png" /></button>
+				</form>
+			</div>
+		</div>
+	</nav>
+	<nav id="top_navbar" class="navbar navbar-default my_transparent">
+		<div class="container-fluid">
+			<div class="navbar-header accept_mouse">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#my_navbar_collapse">
+					<span class="sr-only">Toggle</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand">Happy drawing !</a>
+			</div>
+			<div class="collapse navbar-collapse accept_mouse" id="my_navbar_collapse">
+				<ul class="nav navbar-nav">
+					<li>
+						<p class="navbar-text label label-default" id="select_room_label">Room -</p>
+					</li>
+					<li class="dropdown">
+						<a id="room_dropdown_title" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Current room <span class="caret"></span></a>
+						<ul class="dropdown-menu" role="menu" id="room_list_ul">
+							<li class="divider"></li>
+							<li><a onclick='onRoomClick(this)'>功能建議與問題回報</a></li>
+							<li><a onclick='onRoomClick(this)'>新手村</a></li>
+							<li><a onclick='onRoomClick(this)'>Image</a></li>
+							<li><a onclick='onRoomClick(this)'>Main</a></li>
+							<li class="divider"></li>
+							<li><a data-toggle="modal" data-target="#createRoomDlg">Create new room...</a></li>
+						</ul>
+					</li>
+					<li>
+						<p class="navbar-text label label-primary" id="coord_para">(, ) x </p>
+					</li>
+				</ul>
+				<form class="navbar-form navbar-right" onsubmit="return onClickUpdate();">
+					<div class="form-group">
+						<div class="input-group">
+							<label for="name_ipt" class="input-group-addon">Name</label>
+							<input type="text" id="name_ipt" maxlength="20" class="form-control" placeholder="My nickname..." />
+						</div>
+						<div class="input-group">
+							<label for="status_ipt" class="input-group-addon">Words</label>
+							<input type="text" id="status_ipt" maxlength="100" class="form-control" placeholder="Say something..." />
+						</div>
+					</div>
+					<button type="submit" class="btn btn-default" id="btnSay">Say</button>
+				</form>
+			</div>
+		</div>
+	</nav>
+
+	<!--<div class="row" id="my_status_div">
+		<div class="input-group like_inline" id="name_ipt_container">
+			<label for="name_ipt" class="input-group-addon">Name</label>
+			<input type="text" id="name_ipt" maxlength="20" class="form-control" placeholder="My nickname...">
+		</div>
+		<div class="input-group like_inline" id="status_ipt_container">
+			<label for="status_ipt" class="input-group-addon">Status</label>
+			<input type="text" id="status_ipt" maxlength="100" class="form-control" placeholder="Current status..." />
+			<span class="input-group-btn">
+				<button onclick="onClickUpdate()" class="btn btn-default" type="button">Update!</button>
+			</span>
+		</div>
+	</div>-->
+
+	<!--<div id="go_up" class="go_arrow"></div>
+	<div id="go_down" class="go_arrow"></div>
+	<div id="go_left" class="go_arrow"></div>
+	<div id="go_right" class="go_arrow"></div>-->
+
+	<div id="note_bar" class="panel panel-success">
+		<div class="panel-body">
+			<form onsubmit="return submitNote();">
+				<div class="form-group">
+					<input type="text" id="note_ipt" maxlength="100" class="form-control" placeholder="Leave a message here..." />
+				</div>
+				<div class="btn-group pull-right" data-toggle="buttons">
+					<label class="btn btn-info active">
+						<input type="checkbox" id="check_broadcast_note" autocomplete="off" checked />
+						Broadcast
+					</label>
+				</div>
+				<button type="submit" class="btn btn-primary">Ok</button>
+				<button type="button" class="btn btn-default" onclick="refocus()">Cancel</button>
+			</form>
+		</div>
+	</div>
+	<div id="select_bar" class="btn-group" role="group">
+		<button type="button" class="btn btn-primary" onclick="onSelectCopyClick()">Copy</button>
+		<button type="button" class="btn btn-default" onclick="refocus()">Cancel</button>
+		<button type="button" class="btn btn-success" onclick="onSaveClick()">Save</button>
+	</div>
+	<div id="paste_bar" class="btn-group" role="group">
+		<button type="button" class="btn btn-primary" onclick="onDoPasteClick()">Paste</button>
+		<button type="button" class="btn btn-default" onclick="onTransformClick(2,0,0,2)">
+			<img src="/Images/enlarge.png" /></button>
+		<button type="button" class="btn btn-default" onclick="onTransformClick(.5,0,0,.5)">
+			<img src="/Images/shrink.png" /></button>
+		<button type="button" class="btn btn-default" onclick="onTransformClick(0,-1,1,0)">
+			<img src="/Images/rotate_cw.png" /></button>
+		<button type="button" class="btn btn-default" onclick="onTransformClick(0,1,-1,0)">
+			<img src="/Images/rotate_ccw.png" /></button>
+		<button type="button" class="btn btn-default" onclick="onTransformClick(1,0,0,-1)">
+			<img src="/Images/flip_vert.png" /></button>
+		<button type="button" class="btn btn-default" onclick="onTransformClick(-1,0,0,1)">
+			<img src="/Images/flip_hori.png" /></button>
+		<button type="button" class="btn btn-success" onclick="onResetClick()">Reset</button>
+		<button type="button" class="btn btn-default" onclick="refocus()">Cancel</button>
+	</div>
+	<div id="alert_container" class="text-center accept_mouse">
+		<div></div>
+	</div>
+
+	<script src="/Scripts/jquery-2.1.3.min.js"></script>
+	<script src="/Scripts/jquery.signalR-2.2.0.min.js"></script>
+	<script src="/Scripts/bootstrap.min.js"></script>
+	<script src="/Scripts/lz-string.min.js"></script>
+	<script src="/Scripts/chromoselector.min.js"></script>
+	<script src="/Scripts/paper-core.min.js"></script>
+	<script src="/signalr/hubs"></script>
+
+	<script src="/Scripts/app/helper.js"></script>
+	<script src="/Scripts/app/brush.js"></script>
+	<script src="/Scripts/app/drawing.js"></script>
+	<script src="/Scripts/app/square.js"></script>
+	<!--<script src="bundles/drawing"></script>-->
+</body>
+</html>
